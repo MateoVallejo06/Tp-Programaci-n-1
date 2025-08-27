@@ -1,7 +1,7 @@
 """Proyecto etapa 1"""
 import funciones
 def main():
-    #iniciar matriz por funcion
+    #iniciar matriz por comprension
     
     
     
@@ -10,4 +10,5 @@ def main():
 if __name__ = "main":
 
     main()
+
 
