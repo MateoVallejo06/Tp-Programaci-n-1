@@ -1,14 +1,13 @@
 """Proyecto etapa 1"""
-import funciones
+import Funciones
 def main():
     #iniciar matriz por comprension
+    #prueba
     
     
     
     
-    
-if __name__ = "main":
-
+if __name__ == "__main__":
     main()
 
 
