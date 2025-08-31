@@ -2,7 +2,6 @@
 import Funciones
 def main():
     #iniciar matriz por comprension
-    #prueba de commit
     
     
     
