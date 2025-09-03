@@ -1,7 +1,7 @@
 """Proyecto etapa 1"""
 
-import FuncionesSige
-
+import Funciones
+import random
 
 msj="""
 ------------------------------------------------
@@ -21,7 +21,8 @@ Este programa te permite:
 
 # Función principal
 def main():
-    curso = FuncionesSige.cargar_curso()
+    mats_cargadas = ["Filosofía", "Sociología", "Historia", "Geografía", "Ciudadanía"]
+    curso = Funciones.cargar_curso()
     legajos = []
     nombres = []
     apellidos = []
@@ -29,14 +30,14 @@ def main():
     notas = []
     seguir = 1
     while len(legajos) < 40 and seguir == 1:
-        legajo = FuncionesSige.pedir_legajo(legajos)
+        legajo = Funciones.pedir_legajo(legajos)
         if legajo == 99:
             seguir = 0
             print("Programa finalizado, Gracias por usar SIGE.")
         else:
-            nombre = FuncionesSige.pedir_nombre()
-            materia = FuncionesSige.materia_opcion(0)
-            nota = FuncionesSige.nota_random()
+            nombre = Funciones.pedir_nombre()
+            materia = Funciones.materia_opcion(mats_cargadas)
+            nota = Funciones.nota_random()
             print("Nota asignada:", nota)
 
             legajos.append(legajo)

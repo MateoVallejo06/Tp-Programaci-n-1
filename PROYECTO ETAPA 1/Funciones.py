@@ -33,7 +33,7 @@ def pedir_nombre():
 
 
 #Pide y valida la materia
-def materia_opcion(opcion):
+def materia_opcion(lista):
     print("""Materias disponibles:
     1) Filosofía
     2) Sociología
@@ -43,15 +43,7 @@ def materia_opcion(opcion):
     opcion=int(input("Ingrese el número de la materia (1-5): "))
     while opcion <1 or opcion >5:
         opcion=int(input("Opción no valida, Ingrese el número de la materia (1-5): "))
-    if opcion == 1:
-        return "Filosofía"
-    if opcion == 2:
-        return "Sociología"
-    if opcion == 3:
-        return "Historia"
-    if opcion == 4:
-        return "Geografía"
-    return "Ciudadanía"
+    return lista[opcion-1]
 
 #La nota se asigna de forma aleatoria
 def nota_random():
