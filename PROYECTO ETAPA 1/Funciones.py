@@ -32,6 +32,7 @@ def pedir_nombre():
     return nombre
 
 
+#Pide y valida la materia
 def materia_opcion(opcion):
     print("""Materias disponibles:
     1) Filosofía
@@ -55,28 +56,3 @@ def materia_opcion(opcion):
 #La nota se asigna de forma aleatoria
 def nota_random():
     return random.randint(1, 10)
-
-# Función principal
-def main():
-    curso = cargar_curso()
-    legajos = []
-    nombres = []
-    apellidos = []
-    materias = []
-    notas = []
-    seguir = 1
-    while len(legajos) < 40 and seguir == 1:
-        legajo = pedir_legajo(legajos)
-        if legajo == 99:
-            seguir = 0
-            print("Programa finalizado, Gracias por usar SIGE.")
-        else:
-            nombre = pedir_nombre()
-            materia = materia_opcion(0)  # esta función pide y valida adentro
-            nota = nota_random()
-            print("Nota asignada:", nota)
-
-            legajos.append(legajo)
-            nombres.append(nombre)
-            materias.append(materia)
-            notas.append(nota)
