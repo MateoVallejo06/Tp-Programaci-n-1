@@ -28,7 +28,7 @@ def pedir_legajo(lista):
 
 
 def pedir_nombre():
-    nombre = input("Ingrese el nombre y apellido del alumno: ")
+    nombre = input("Ingrese el nombre y apellido del alumno: ").title()
     return nombre
 
 
