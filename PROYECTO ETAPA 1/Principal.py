@@ -1,7 +1,6 @@
 """Proyecto etapa 1"""
 
 import Funciones
-import random
 
 msj="""
 ------------------------------------------------
@@ -21,31 +20,38 @@ Este programa te permite:
 
 # Función principal
 def main():
-    mats_cargadas = ["Filosofía", "Sociología", "Historia", "Geografía", "Ciudadanía"]
+    materias_cargadas = ["Filosofía", "Sociología", "Historia", "Geografía", "Ciudadanía"]
     curso = Funciones.cargar_curso()
     legajos = []
     nombres = []
-    apellidos = []
-    materias = []
     notas = []
+    alumnos = Funciones.cargar_alumnos()
     seguir = 1
-    while len(legajos) < 40 and seguir == 1:
+
+    while len(legajos) < alumnos and seguir == 1:
         legajo = Funciones.pedir_legajo(legajos)
         if legajo == 99:
             seguir = 0
-            print("Programa finalizado, Gracias por usar SIGE.")
         else:
             nombre = Funciones.pedir_nombre()
-            materia = Funciones.materia_opcion(mats_cargadas)
-            nota = Funciones.nota_random()
-            print("Nota asignada:", nota)
-
+            notas_por_alumno = Funciones.materia_notas(materias_cargadas)
             legajos.append(legajo)
             nombres.append(nombre)
-            materias.append(materia)
-            notas.append(nota)
+            notas.append(notas_por_alumno)
+
+    Funciones.mostrar_estadisticas_notas(notas)
+    Funciones.alumnos_notas(nombres, notas, materias_cargadas, 10)
+    Funciones.alumnos_notas(nombres, notas, materias_cargadas, 6)
+    Funciones.mostrar_top_promedios(nombres, notas)
+    Funciones.aprobados_aplazados_materias(nombres, notas, materias_cargadas)
+
 
 
 print(msj)
 if __name__ == "__main__":
     main()
+    print("Programa finalizado, Gracias por usar SIGE.")
+print(msj)
+if __name__ == "__main__":
+    main()
+
