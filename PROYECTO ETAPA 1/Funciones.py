@@ -1,5 +1,5 @@
 """Funciones proyecto etapa 1"""
-
+#prueba
 import random
 
 def cargar_curso():
