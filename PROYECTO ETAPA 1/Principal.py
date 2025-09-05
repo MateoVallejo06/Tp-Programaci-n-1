@@ -26,7 +26,9 @@ def main():
     nombres = []
     notas = []
     alumnos = Funciones.cargar_alumnos()
+    m = [[0]*7 for i in range(alumnos)]
     seguir = 1
+    cont = 0
 
     while len(legajos) < alumnos and seguir == 1:
         legajo = Funciones.pedir_legajo(legajos)
@@ -35,10 +37,18 @@ def main():
         else:
             nombre = Funciones.pedir_nombre()
             notas_por_alumno = Funciones.materia_notas(materias_cargadas)
+            m[len(legajos)] [0] = legajo
+            m[len(legajos)] [1] = nombre
+            for j in range (len((notas_por_alumno))):
+                m[len(legajos)] [2+j] = notas_por_alumno
+
+
             legajos.append(legajo)
             nombres.append(nombre)
             notas.append(notas_por_alumno)
 
+        cont += 1
+    Funciones.matriz_completa(m,alumnos,7,curso)
     Funciones.mostrar_estadisticas_notas(notas)
     Funciones.alumnos_notas(nombres, notas, materias_cargadas, 10)
     Funciones.alumnos_notas(nombres, notas, materias_cargadas, 6)

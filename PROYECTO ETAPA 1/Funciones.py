@@ -50,6 +50,29 @@ def materia_notas(lista_materias):
         print(f"{lista_materias[i]}: {nota}")
     return lista_notas
 
+#Matriz
+def matriz_completa(mat,cf,cc,cur):
+    print(f"LISTADO DE NOTAS CUATRIMESTRALES - CURSO: {cur}")
+    print("-"*100)                                 
+    print("Legajo     Nombre y Apellido     Filosofía     Sociología     Historia     Geografía     Ciudadanía")
+    for i in range(cf):
+        print(f"{mat[i][0]}", end="      ")
+        print(f"{mat[i][1]}", end="      ")
+        for j in range(2, cc):
+            print(f"{mat[i][j]}", end="       ")
+        print("\n")
+    print(f"Promedios: Filosofía: {promedio(mat[i][2])} Sociología: {promedio(mat[i][2])} Historia: {promedio(mat[i][3])} Geografía: {promedio(mat[i][4])} Ciudadanía: {promedio(mat[i][5])}")
+    print("-"*100)
+
+def promedio(lista):
+    sum = 0
+    for i in range(len(lista)):
+        sum += i
+    prom = i / len(lista)
+    return lista
+
+
+
 
 # Muestra cantidad y porcentaje de aprobados, desaprobados y aplazados
 def mostrar_estadisticas_notas(notas):
