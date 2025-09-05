@@ -69,7 +69,7 @@ def promedio(lista):
     for i in range(len(lista)):
         sum += i
     prom = i / len(lista)
-    return lista
+    return prom
 
 
 
