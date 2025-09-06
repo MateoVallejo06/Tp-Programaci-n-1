@@ -40,7 +40,7 @@ def main():
             m[len(legajos)] [0] = legajo
             m[len(legajos)] [1] = nombre
             for j in range (len((notas_por_alumno))):
-                m[len(legajos)] [2+j] = notas_por_alumno
+                m[len(legajos)] [2+j] = notas_por_alumno[j]
 
 
             legajos.append(legajo)
@@ -48,7 +48,7 @@ def main():
             notas.append(notas_por_alumno)
 
         cont += 1
-    Funciones.matriz_completa(m,alumnos,7,curso)
+    Funciones.matriz_completa(m,alumnos,7,curso,materias_cargadas)
     Funciones.mostrar_estadisticas_notas(notas)
     Funciones.alumnos_notas(nombres, notas, materias_cargadas, 10)
     Funciones.alumnos_notas(nombres, notas, materias_cargadas, 6)

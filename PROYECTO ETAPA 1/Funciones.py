@@ -51,26 +51,23 @@ def materia_notas(lista_materias):
     return lista_notas
 
 #Matriz
-def matriz_completa(mat,cf,cc,cur):
+def matriz_completa(mat,cf,cc,cur,materias):
     print(f"LISTADO DE NOTAS CUATRIMESTRALES - CURSO: {cur}")
     print("-"*100)                                 
     print("Legajo     Nombre y Apellido     Filosofía     Sociología     Historia     Geografía     Ciudadanía")
+    not_por_mat = [0] * (cc - 2)
     for i in range(cf):
         print(f"{mat[i][0]}", end="      ")
         print(f"{mat[i][1]}", end="      ")
         for j in range(2, cc):
-            print(f"{mat[i][j]}", end="       ")
+            nota = mat[i][j]
+            not_por_mat[j-2] += nota
+            print(f"{nota:<5}", end="       ")
         print("\n")
-    print(f"Promedios: Filosofía: {promedio(mat[i][2])} Sociología: {promedio(mat[i][2])} Historia: {promedio(mat[i][3])} Geografía: {promedio(mat[i][4])} Ciudadanía: {promedio(mat[i][5])}")
-    print("-"*100)
-
-def promedio(lista):
-    sum = 0
-    for i in range(len(lista)):
-        sum += i
-    prom = i / len(lista)
-    return prom
-
+    for t in range(len(materias)):
+        prom = not_por_mat[t]/cf
+        print(f"Promedios - {materias[t]}: {prom:.2f}", end="    ")
+    print("\n" + "-"*100)
 
 
 
@@ -121,7 +118,8 @@ def mostrar_top_promedios(nombres, notas):
             suma += nota
         promedio = suma / len(notas[i])
         promedios.append((promedio, nombres[i]))
-    promedios.sort()
+
+    promedios.sort(key=lambda x :x[0], reverse=True)
 
     print("\n--- Top 3 Mejores promedios ---")
     for i in range(min(3, len(promedios))):
