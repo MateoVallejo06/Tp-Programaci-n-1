@@ -50,24 +50,26 @@ def materia_notas(lista_materias):
         print(f"{lista_materias[i]}: {nota}")
     return lista_notas
 
-#Matriz
+#Matriz y promedios
 def matriz_completa(mat,cf,cc,cur,materias):
     print(f"LISTADO DE NOTAS CUATRIMESTRALES - CURSO: {cur}")
     print("-"*100)                                 
-    print("Legajo     Nombre y Apellido     Filosofía     Sociología     Historia     Geografía     Ciudadanía")
+    print(f"{'Legajo':<10}{'Nombre y Apellido':<25}{'Filosofía':<15}{'Sociología':<15}{'Historia':<15}{'Geografía':<15}{'Ciudadanía':<15}")
     not_por_mat = [0] * (cc - 2)
     for i in range(cf):
-        print(f"{mat[i][0]}", end="      ")
-        print(f"{mat[i][1]}", end="      ")
+        print(f"{mat[i][0]:<10}", end="")
+        print(f"{mat[i][1]:<25}", end="")
         for j in range(2, cc):
             nota = mat[i][j]
             not_por_mat[j-2] += nota
-            print(f"{nota:<5}", end="       ")
+            print(f"{nota:<15}", end="")
         print("\n")
+    print("-"*100)
+    print(f"{'Promedios':<35}")
     for t in range(len(materias)):
         prom = not_por_mat[t]/cf
-        print(f"Promedios - {materias[t]}: {prom:.2f}", end="    ")
-    print("\n" + "-"*100)
+        print(f"{materias[t]}: {prom:.2f}", end="   ")
+    print("\n")
 
 
 
