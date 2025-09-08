@@ -19,9 +19,8 @@ Este programa te permite:
 """
 
 # Función principal
-def main():
+def main(curso):
     materias_cargadas = ["Filosofía", "Sociología", "Historia", "Geografía", "Ciudadanía"]
-    curso = Funciones.cargar_curso()
     legajos = []
     nombres = []
     notas = []
@@ -59,9 +58,8 @@ def main():
 
 print(msj)
 if __name__ == "__main__":
-    main()
+    curso = Funciones.cargar_curso()
+    while curso != "Finalizar":
+        main(curso)
+        curso = Funciones.cargar_curso()
     print("Programa finalizado, Gracias por usar SIGE.")
-print(msj)
-if __name__ == "__main__":
-    main()
-
