@@ -19,16 +19,17 @@ Este programa te permite:
 """
 
 # Función para listar alumnos que desaprobaron 3 materias
-def listar_alumnos_desaprobados_3_materias(nombres, notas):
+def listar_alumnos_desaprobados_3_materias(lista_nombres, lista_notas):
     print("\nAlumnos que desaprobaron 3 materias:")
     encontrados = False
-    for i in range(len(notas)):
-        desaprobadas = sum(1 for nota in notas[i] if nota < 7)
+    for i in range(len(lista_notas)):
+        desaprobadas = sum(1 for nota in lista_notas[i] if nota < 7)
         if desaprobadas == 3:
-            print(f"{nombres[i]} - Materias desaprobadas: {desaprobadas}")
+            print(f"{lista_nombres[i]} - Materias desaprobadas: {desaprobadas}")
             encontrados = True
     if not encontrados:
         print("No hay alumnos que hayan desaprobado exactamente 3 materias.")
+
 
 # Función principal
 def main(curso):
@@ -76,4 +77,5 @@ if __name__ == "__main__":
         main(curso)
         curso = Funciones.cargar_curso()
     print("Programa finalizado, Gracias por usar SIGE.")
+
 
