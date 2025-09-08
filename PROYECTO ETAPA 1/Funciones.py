@@ -3,7 +3,7 @@
 import random
 
 def cargar_curso():
-    texto = input("ingrese el nombre del curso: ")
+    texto = input("ingrese el nombre del curso o Finalizar para salir: ").title() 
     return texto
 
 
@@ -111,26 +111,26 @@ def alumnos_notas(nombres, notas, materias, valor_buscado):
 
 
 # Top 3 alumnos con notas más altas y más bajas
-def mostrar_top_promedios(nombres, notas):
+def mostrar_top_promedios(nombres, notas, n=3):
     promedios = []
     for i in range(len(nombres)):
-        suma = 0
-        # nombres, promedios
-        for nota in notas[i]:
-            suma += nota
-        promedio = suma / len(notas[i])
+        promedio = sum(notas[i]) / len(notas[i])   
         promedios.append((promedio, nombres[i]))
 
-    promedios.sort(key=lambda x :x[0], reverse=True)
+    # se ordena de mayor a menor
+    promedios.sort(key=lambda x: x[0], reverse=True)
 
-    print("\n--- Top 3 Mejores promedios ---")
-    for i in range(min(3, len(promedios))):
-        print(f"{promedios[i][1]} -> Promedio: {promedios[i][0]:.2f}")
+    # slicing para mejores y peores
+    top_mejores = promedios[:n]           
+    top_peores  = promedios[-n:][::-1]   
 
-    print("\n--- Top 3 Peores promedios ---")
-    for i in range(min(3, len(promedios))):
-        peor = promedios[len(promedios) - 1 - i]
-        print(f"{peor[1]} -> Promedio: {peor[0]:.2f}")
+    print(f"\n--- Top {n} Mejores promedios (todas las materias) ---")
+    for promedio, nombre in top_mejores:
+        print(f"{nombre} -> Promedio: {promedio:.2f}")
+
+    print(f"\n--- Top {n} Peores promedios (todas las materias) ---")
+    for promedio, nombre in top_peores:
+        print(f"{nombre} -> Promedio: {promedio:.2f}")
 
 
 def buscar_indice_materia(materias, nombre_materia):
