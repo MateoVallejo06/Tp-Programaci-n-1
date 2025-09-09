@@ -155,3 +155,16 @@ def aprobados_aplazados_materias(nombres, notas, materias):
 
     print(f"\nAprobados en Sociología: {aprobados_sociologia}")
     print(f"Aplazados en Historia: {aplazados_historia}")
+    
+    
+    # Función para listar alumnos que desaprobaron 3 materias
+def listar_alumnos_desaprobados_3_materias(lista_nombres, lista_notas):
+    print("\nAlumnos que desaprobaron 3 materias:")
+    encontrados = False
+    for i in range(len(lista_notas)):
+        desaprobadas = sum(1 for nota in lista_notas[i] if nota < 7)
+        if desaprobadas == 3:
+            print(f"{lista_nombres[i]} - Materias desaprobadas: {desaprobadas}")
+            encontrados = True
+    if not encontrados:
+        print("No hay alumnos que hayan desaprobado exactamente 3 materias.")
