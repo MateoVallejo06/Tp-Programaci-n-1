@@ -168,3 +168,19 @@ def listar_alumnos_desaprobados_3_materias(lista_nombres, lista_notas):
             encontrados = True
     if not encontrados:
         print("No hay alumnos que hayan desaprobado exactamente 3 materias.")
+
+#Función para buscar alumno por legajo y mostrar sus notas
+def buscar_alumno_por_legajo(lista_legajos, lista_nombres, lista_notas, lista_materias):
+    legajo_buscar = int(input("Ingrese el número de legajo a buscar: "))
+    encontrado = False
+    for i in range(len(lista_legajos)):
+        if lista_legajos[i] == legajo_buscar:
+            print()
+            print(f"Alumno: {lista_nombres[i]}")
+            print("Notas:")
+            for j in range(len(lista_materias)):
+                print(f"{lista_materias[j]}: {lista_notas[i][j]}")
+            encontrado = True
+            break
+    if not encontrado:
+        print("Alumno no cargado.")
