@@ -57,7 +57,10 @@ def main(curso):
     Funciones.mostrar_top_promedios(nombres, notas)
     Funciones.aprobados_aplazados_materias(nombres, notas, materias_cargadas)
     Funciones.listar_alumnos_desaprobados_3_materias(nombres, notas)
-
+    opcion_busqueda = input("¿Desea buscar un alumno por legajo? (Ingresar: si/no): ").lower()
+    while opcion_busqueda == "si":
+        Funciones.buscar_alumno_por_legajo(legajos, nombres, notas, materias_cargadas)
+        opcion_busqueda = input("¿Desea buscar otro alumno por legajo? (Ingresar: si/no): ").lower()
 
 
 print(msj)
@@ -67,6 +70,7 @@ if __name__ == "__main__":
         main(curso)
         curso = Funciones.cargar_curso()
     print("Programa finalizado, Gracias por usar SIGE.")
+
 
 
 
