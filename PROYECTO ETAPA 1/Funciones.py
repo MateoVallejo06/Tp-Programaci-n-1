@@ -181,6 +181,6 @@ def buscar_alumno_por_legajo(lista_legajos, lista_nombres, lista_notas, lista_ma
             for j in range(len(lista_materias)):
                 print(f"{lista_materias[j]}: {lista_notas[i][j]}")
             encontrado = True
-            break
+
     if not encontrado:
         print("Alumno no cargado.")
