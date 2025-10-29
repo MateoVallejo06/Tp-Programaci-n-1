@@ -452,6 +452,10 @@ def menu_principal(usuario):
             print("5. Generar archivo de estudiantes")
             print("6. Generar archivo de materias")
             print("7. Generar archivo de notas")
+            print("8. Cargar asistencia")
+            print("9. Generar promedios anuales")
+            print("10. Generar promedio por materia")
+            print("11. Mostrar nota mas baja y mas alta por materia")
             print("0. Salir")
             print("="*60)
             
@@ -471,6 +475,14 @@ def menu_principal(usuario):
                 generar_materias()
             elif opcion == "7":
                 generar_notas()
+            elif opcion == "8":
+                cargar_asistencia(usuario)
+            elif opcion == "9":
+                generar_promedios_anuales(usuario)
+            elif opcion == "10":
+                generar_promedio_por_materia(usuario)
+            elif opcion == "11":
+                mostrar_notas_maxmin()
             elif opcion == "0":
                 print("\nCerrando sesión...")
                 continuar = False
@@ -482,3 +494,187 @@ def menu_principal(usuario):
         except KeyboardInterrupt:
             print("\n\nInterrupción detectada. Cerrando sesión...")
             continuar = False
+            
+ARCHIVO_ASISTENCIA = "asistenciaPorMateria.csv"
+ARCHIVO_PROMEDIOS_ANUALES = "promediosAnuales.csv"
+ARCHIVO_PROMEDIOS_MATERIA = "promedioPorMateria.csv"
+ARCHIVO_LOG = "log.txt"
+
+
+def registrar_log(usuario, accion):
+    """Agrega una línea al log sin usar librerías externas"""
+    try:
+        linea = f"Usuario: {usuario} - Acción: {accion}\n"
+        f = open(ARCHIVO_LOG, "a")
+        f.write(linea)
+        f.close()
+    except:
+        print("Error al escribir en el log.")
+
+
+def cargar_asistencia(usuario):
+    """Permite registrar o modificar asistencia"""
+    try:
+        codigo = input("Código de materia: ").strip()
+        legajo = input("Legajo del alumno: ").strip()
+        porcentaje = input("Porcentaje de asistencia (0-100): ").strip()
+
+        if not porcentaje.replace(".", "", 1).isdigit():
+            print("Debe ingresar un número válido.")
+            return
+        porcentaje = float(porcentaje)
+        if porcentaje < 0 or porcentaje > 100:
+            print("Debe estar entre 0 y 100.")
+            return
+
+        registros = []
+        actualizado = False
+        try:
+            f = open(ARCHIVO_ASISTENCIA, "r")
+            linea = f.readline()
+            while linea:
+                partes = linea.strip().split(",")
+                if len(partes) == 3:
+                    if partes[0] == codigo and partes[1] == legajo:
+                        partes[2] = str(porcentaje)
+                        actualizado = True
+                    registros.append(",".join(partes))
+                linea = f.readline()
+            f.close()
+        except FileNotFoundError:
+            pass
+
+        if not actualizado:
+            registros.append(f"{codigo},{legajo},{porcentaje}")
+
+        f = open(ARCHIVO_ASISTENCIA, "w")
+        for r in registros:
+            f.write(r + "\n")
+        f.close()
+
+        print("Asistencia registrada correctamente.")
+        registrar_log(usuario, f"Asistencia materia {codigo}, legajo {legajo}")
+
+    except Exception as e:
+        print("Error:", e)
+
+
+def generar_promedios_anuales(usuario):
+    """Calcula y guarda el promedio anual de cada alumno"""
+    try:
+        estudiantes = {}
+        f = open(ARCHIVO_ESTUDIANTES, "r")
+        f.readline()
+        linea = f.readline()
+        while linea:
+            legajo, nombre, apellido, año, division = linea.strip().split(",")
+            estudiantes[legajo] = {"nombre": nombre, "apellido": apellido,
+                                   "año": año, "division": division, "notas": []}
+            linea = f.readline()
+        f.close()
+
+        f = open(ARCHIVO_NOTAS, "r")
+        f.readline()
+        linea = f.readline()
+        while linea:
+            partes = linea.strip().split(",")
+            if len(partes) >= 6:
+                legajo = partes[0]
+                notas = [int(x) for x in partes[2:]]
+                promedio = sum(notas) / len(notas)
+                if legajo in estudiantes:
+                    estudiantes[legajo]["notas"].append(promedio)
+            linea = f.readline()
+        f.close()
+
+        f = open(ARCHIVO_PROMEDIOS_ANUALES, "w")
+        f.write("legajo,nombre,apellido,año,division,promedio\n")
+        for legajo, datos in estudiantes.items():
+            if datos["notas"]:
+                prom_final = round(sum(datos["notas"]) / len(datos["notas"]), 2)
+                f.write(f"{legajo},{datos['nombre']},{datos['apellido']},{datos['año']},{datos['division']},{prom_final}\n")
+        f.close()
+
+        print("Archivo 'promediosAnuales.csv' generado correctamente.")
+        registrar_log(usuario, "Generó promedios anuales")
+
+    except FileNotFoundError:
+        print("Primero debe generar los archivos de entrada.")
+    except Exception as e:
+        print("Error:", e)
+
+
+def generar_promedio_por_materia(usuario):
+    """Calcula el promedio general de una materia"""
+    try:
+        codigo = input("Código de materia: ").strip()
+
+        nombre_materia = None
+        f = open(ARCHIVO_MATERIAS, "r")
+        f.readline()
+        linea = f.readline()
+        while linea:
+            cod, nombre, anio = linea.strip().split(",")
+            if cod == codigo:
+                nombre_materia = nombre
+                break
+            linea = f.readline()
+        f.close()
+
+        if not nombre_materia:
+            print("Código no encontrado.")
+            return
+
+        notas_materia = []
+        f = open(ARCHIVO_NOTAS, "r")
+        f.readline()
+        linea = f.readline()
+        while linea:
+            partes = linea.strip().split(",")
+            if partes[1] == codigo:
+                notas = [int(x) for x in partes[2:]]
+                prom = sum(notas) / len(notas)
+                notas_materia.append(prom)
+            linea = f.readline()
+        f.close()
+
+        if not notas_materia:
+            print("No hay notas para esa materia.")
+            return
+
+        prom_general = round(sum(notas_materia) / len(notas_materia), 2)
+
+        f = open(ARCHIVO_PROMEDIOS_MATERIA, "a")
+        f.write(f"{codigo},{nombre_materia},{prom_general}\n")
+        f.close()
+
+        print(f"Promedio general de {nombre_materia}: {prom_general}")
+        registrar_log(usuario, f"Promedio de materia {nombre_materia}")
+
+    except FileNotFoundError:
+        print("Debe generar primero los archivos base.")
+    except Exception as e:
+        print("Error:", e)
+        
+def mostrar_notas_maxmin():
+    try:
+        codigo = input("Código de materia: ").strip()
+        f = open(ARCHIVO_NOTAS, "r")
+        f.readline()
+        notas_totales = []
+        linea = f.readline()
+        while linea:
+            partes = linea.strip().split(",")
+            if partes[1] == codigo:
+                notas = [int(x) for x in partes[2:]]
+                notas_totales.extend(notas)
+            linea = f.readline()
+        f.close()
+
+        if notas_totales:
+            print("Nota más baja:", min(notas_totales))
+            print("Nota más alta:", max(notas_totales))
+        else:
+            print("No hay notas para esa materia.")
+    except FileNotFoundError:
+        print("Debe generar primero los archivos de entrada.")
