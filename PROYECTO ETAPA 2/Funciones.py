@@ -314,7 +314,7 @@ def cargar_materias():
                     if len(materias) == 0:
                         print("Debe ingresar al menos una materia por año.")
                     else:
-                        continuar_año == False
+                        continuar_año = False
                 else:
                     materias.append(materia)
                     print(f"Agregada: {materia}")
@@ -531,12 +531,11 @@ def registrar_log(usuario, accion):
     except:
         print("Error al escribir en el log.")
 
-
 def cargar_asistencia(usuario):
     """Permite registrar o modificar asistencia"""
-    ejecutado = False
     
     try:
+        # Validar que existan los archivos necesarios
         try:
             f_test = open(ARCHIVO_MATERIAS, "r")
             f_test.close()
@@ -548,52 +547,113 @@ def cargar_asistencia(usuario):
             archivos_existen = False
         
         if archivos_existen:
-            codigo = input("Código de materia: ").strip()
-            legajo = input("Legajo del alumno: ").strip()
-            porcentaje = input("Porcentaje de asistencia (0-100): ").strip()
-
-            if not porcentaje.replace(".", "", 1).isdigit():
-                print("Debe ingresar un número válido.")
-            else:
-                porcentaje = float(porcentaje)
-                if porcentaje < 0 or porcentaje > 100:
-                    print("Debe estar entre 0 y 100.")
-                else:
-                    registros = []
-                    actualizado = False
-                    try:
-                        f = open(ARCHIVO_ASISTENCIA, "r")
+            continuar = True
+            contador = 0
+            
+            while continuar:
+                print("\n" + "-"*50)
+                
+                codigo_valido = None
+                while codigo_valido is None:
+                    codigo = input("Código de materia (o '0' para salir): ").strip()
+                    
+                    if codigo == "0":
+                        continuar = False
+                        break
+                    
+                    f = open(ARCHIVO_MATERIAS, "r")
+                    f.readline()  
+                    linea = f.readline()
+                    encontrado = False
+                    
+                    while linea and not encontrado:
+                        partes = linea.strip().split(",")
+                        if len(partes) >= 3 and partes[0] == codigo:
+                            codigo_valido = codigo
+                            encontrado = True
                         linea = f.readline()
-                        while linea:
-                            partes = linea.strip().split(",")
-                            if len(partes) == 3:
-                                if partes[0] == codigo and partes[1] == legajo:
-                                    partes[2] = str(porcentaje)
-                                    actualizado = True
-                                registros.append(",".join(partes))
-                            linea = f.readline()
-                        f.close()
-                    except FileNotFoundError:
-                        pass
-
-                    if not actualizado:
-                        registros.append(f"{codigo},{legajo},{porcentaje}")
-
-                    f = open(ARCHIVO_ASISTENCIA, "w")
-                    for r in registros:
-                        f.write(r + "\n")
                     f.close()
+                    
+                    if codigo_valido is None and codigo != "0":
+                        print(f"Código de materia '{codigo}' no encontrado. Intente nuevamente.")
+                
+                if not continuar:
+                    break
+                
+                legajo_valido = None
+                while legajo_valido is None:
+                    legajo = input("Legajo del alumno: ").strip()
+                    
+                    f = open(ARCHIVO_ESTUDIANTES, "r")
+                    f.readline()  
+                    linea = f.readline()
+                    encontrado = False
+                    
+                    while linea and not encontrado:
+                        partes = linea.strip().split(",")
+                        if len(partes) >= 1 and partes[0] == legajo:
+                            legajo_valido = legajo
+                            encontrado = True
+                        linea = f.readline()
+                    f.close()
+                    
+                    if legajo_valido is None:
+                        print(f"Legajo '{legajo}' no encontrado. Intente nuevamente.")
+                
+                porcentaje_valido = False
+                while not porcentaje_valido:
+                    porcentaje = input("Porcentaje de asistencia (0-100): ").strip()
+                    
+                    if not porcentaje.replace(".", "", 1).isdigit():
+                        print("Debe ingresar un número válido.")
+                    else:
+                        porcentaje_float = float(porcentaje)
+                        if porcentaje_float < 0 or porcentaje_float > 100:
+                            print("Debe estar entre 0 y 100.")
+                        else:
+                            porcentaje_valido = True
+                
+                registros = []
+                actualizado = False
+                try:
+                    f = open(ARCHIVO_ASISTENCIA, "r")
+                    linea = f.readline()
+                    while linea:
+                        partes = linea.strip().split(",")
+                        if len(partes) == 3:
+                            if partes[0] == codigo_valido and partes[1] == legajo_valido:
+                                partes[2] = porcentaje
+                                actualizado = True
+                            registros.append(",".join(partes))
+                        linea = f.readline()
+                    f.close()
+                except FileNotFoundError:
+                    pass
+                
+                if not actualizado:
+                    registros.append(f"{codigo_valido},{legajo_valido},{porcentaje}")
+                
 
-                    print("Asistencia registrada correctamente.")
-                    registrar_log(usuario, f"Asistencia materia {codigo}, legajo {legajo}")
-                    ejecutado = True
+                f = open(ARCHIVO_ASISTENCIA, "w")
+                for r in registros:
+                    f.write(r + "\n")
+                f.close()
+                
+                contador += 1
+                print(f"Asistencia registrada correctamente. Total de registros: {contador}")
+                registrar_log(usuario, f"Asistencia materia {codigo_valido}, legajo {legajo_valido}")
+            
+            if contador > 0:
+                print(f"Se registraron {contador} asistencias en total.")
+            else:
+                print("No se registraron asistencias.")
 
+    except ValueError as e:
+        print(f"Error de formato: {e}")
     except IOError as e:
         print(f"Error de entrada/salida: {e}")
     except KeyboardInterrupt:
         print("Operación cancelada.")
-
-
 
 def generar_promedios_anuales(usuario):
     """Calcula y guarda el promedio anual de cada alumno"""
