@@ -304,7 +304,7 @@ def cargar_materias():
         materias_por_año = {}
 
         for año in range(1,6):
-            print("--AÑO  {año} --")
+            print(f"--AÑO  {año} --")
             materias = []
             continuar_año = True
             while continuar_año:
@@ -317,7 +317,7 @@ def cargar_materias():
                         continuar_año == False
                 else:
                     materias.append(materia)
-                    print("Agregada: {materia}")
+                    print(f"Agregada: {materia}")
             
             materias_por_año[año] = materias
             print(f"Total de materias para año {año}: {len(materias)}")
@@ -534,49 +534,65 @@ def registrar_log(usuario, accion):
 
 def cargar_asistencia(usuario):
     """Permite registrar o modificar asistencia"""
+    ejecutado = False
+    
     try:
-        codigo = input("Código de materia: ").strip()
-        legajo = input("Legajo del alumno: ").strip()
-        porcentaje = input("Porcentaje de asistencia (0-100): ").strip()
-
-        if not porcentaje.replace(".", "", 1).isdigit():
-            print("Debe ingresar un número válido.")
-            return
-        porcentaje = float(porcentaje)
-        if porcentaje < 0 or porcentaje > 100:
-            print("Debe estar entre 0 y 100.")
-            return
-
-        registros = []
-        actualizado = False
         try:
-            f = open(ARCHIVO_ASISTENCIA, "r")
-            linea = f.readline()
-            while linea:
-                partes = linea.strip().split(",")
-                if len(partes) == 3:
-                    if partes[0] == codigo and partes[1] == legajo:
-                        partes[2] = str(porcentaje)
-                        actualizado = True
-                    registros.append(",".join(partes))
-                linea = f.readline()
-            f.close()
+            f_test = open(ARCHIVO_MATERIAS, "r")
+            f_test.close()
+            f_test = open(ARCHIVO_ESTUDIANTES, "r")
+            f_test.close()
+            archivos_existen = True
         except FileNotFoundError:
-            pass
+            print("Debe generar primero el plan de estudios (opción 4).")
+            archivos_existen = False
+        
+        if archivos_existen:
+            codigo = input("Código de materia: ").strip()
+            legajo = input("Legajo del alumno: ").strip()
+            porcentaje = input("Porcentaje de asistencia (0-100): ").strip()
 
-        if not actualizado:
-            registros.append(f"{codigo},{legajo},{porcentaje}")
+            if not porcentaje.replace(".", "", 1).isdigit():
+                print("Debe ingresar un número válido.")
+            else:
+                porcentaje = float(porcentaje)
+                if porcentaje < 0 or porcentaje > 100:
+                    print("Debe estar entre 0 y 100.")
+                else:
+                    registros = []
+                    actualizado = False
+                    try:
+                        f = open(ARCHIVO_ASISTENCIA, "r")
+                        linea = f.readline()
+                        while linea:
+                            partes = linea.strip().split(",")
+                            if len(partes) == 3:
+                                if partes[0] == codigo and partes[1] == legajo:
+                                    partes[2] = str(porcentaje)
+                                    actualizado = True
+                                registros.append(",".join(partes))
+                            linea = f.readline()
+                        f.close()
+                    except FileNotFoundError:
+                        pass
 
-        f = open(ARCHIVO_ASISTENCIA, "w")
-        for r in registros:
-            f.write(r + "\n")
-        f.close()
+                    if not actualizado:
+                        registros.append(f"{codigo},{legajo},{porcentaje}")
 
-        print("Asistencia registrada correctamente.")
-        registrar_log(usuario, f"Asistencia materia {codigo}, legajo {legajo}")
+                    f = open(ARCHIVO_ASISTENCIA, "w")
+                    for r in registros:
+                        f.write(r + "\n")
+                    f.close()
 
-    except Exception as e:
-        print("Error:", e)
+                    print("Asistencia registrada correctamente.")
+                    registrar_log(usuario, f"Asistencia materia {codigo}, legajo {legajo}")
+                    ejecutado = True
+
+    except IOError as e:
+        print(f"Error de entrada/salida: {e}")
+    except KeyboardInterrupt:
+        print("Operación cancelada.")
+
 
 
 def generar_promedios_anuales(usuario):
@@ -619,9 +635,12 @@ def generar_promedios_anuales(usuario):
         registrar_log(usuario, "Generó promedios anuales")
 
     except FileNotFoundError:
-        print("Primero debe generar los archivos de entrada.")
-    except Exception as e:
-        print("Error:", e)
+        print("Primero debe generar los archivos de entrada: ")
+        print("Plan de estudios (opcion 4) - Cargar notas (opción 5)")
+    except ValueError as e:
+        print("Error de formato:", e)
+    except IOError:
+        print("Error de entrada/salida")
 
 
 def generar_promedio_por_materia(usuario):
@@ -678,7 +697,8 @@ def generar_promedio_por_materia(usuario):
             resultado = False
 
     except FileNotFoundError:
-        print("Debe generar primero los archivos base.")
+        print("Debe generar primero los archivos de entrada: ")
+        print("Plan de estudios (opción 4) - Cargar notas (Opción 5)")
         resultado = False
     except ValueError as e:
         print(f"Error de formato: {e}")
@@ -713,4 +733,5 @@ def mostrar_notas_maxmin():
         else:
             print("No hay notas para esa materia.")
     except FileNotFoundError:
-        print("Debe generar primero los archivos de entrada.")
+        print("Debe generar primero los archivos de entrada: ")
+        print("Plan de estudios (opción 4) - Cargar notas (opción 5)")
