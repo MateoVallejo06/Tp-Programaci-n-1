@@ -258,7 +258,6 @@ def generar_estudiantes():
                     print("Debe ser un número entre 10 y 100.")
             except ValueError:
                 print("Debe ingresar un número válido.")
-        
 
         fake = Faker('es_ES')
         
@@ -284,26 +283,46 @@ def generar_estudiantes():
         resultado = True
         
     except IOError as e:
-        print(f"❌ Error de escritura: {e}")
+        print(f"Error de escritura: {e}")
     
     return resultado
 
-def generar_materias():
-    """Genera archivo CSV con datos de materias"""
+def cargar_materias():
+    """Genera archivo CSV con datos de materias ingresadas"""
     resultado = False
     try:
         print("\n" + "="*50)
         print("GENERANDO ARCHIVO: materias.csv")
         print("="*50)
         
-        materias_por_año = {
-            1: ["Matemática I", "Lengua I", "Historia I", "Ciencias Naturales I", "Inglés I"],
-            2: ["Matemática II", "Lengua II", "Historia II", "Física I", "Inglés II"],
-            3: ["Matemática III", "Literatura I", "Geografía I", "Química I", "Inglés III"],
-            4: ["Matemática IV", "Literatura II", "Geografía II", "Química II", "Biología I"],
-            5: ["Análisis Matemático", "Filosofía", "Educación Cívica", "Biología II", "Inglés IV"]
-        }
+        print("Generando archivo de estudiantes")
+        estudiantes_generados = generar_estudiantes()
+          
+        if estudiantes_generados:
+            print("Ingrese las materias para cada año (ingresar 1 por línea o deje vacío para terminar el año)")
+
+        materias_por_año = {}
+
+        for año in range(1,6):
+            print("--AÑO  {año} --")
+            materias = []
+            continuar_año = True
+            while continuar_año:
+                materia = input(f"Materia {len(materias)+1} (o Enter para terminar el año {año}): ").strip()
         
+                if materia == "":
+                    if len(materias) == 0:
+                        print("Debe ingresar al menos una materia por año.")
+                    else:
+                        continuar_año == False
+                else:
+                    materias.append(materia)
+                    print("Agregada: {materia}")
+            
+            materias_por_año[año] = materias
+            print(f"Total de materias para año {año}: {len(materias)}")
+
+
         f = open(ARCHIVO_MATERIAS, 'w')
         f.write("codigo,nombre,año\n")
         
@@ -322,122 +341,145 @@ def generar_materias():
         resultado = True
         
     except IOError as e:
-        print(f"❌ Error de escritura: {e}")
+        print(f"Error de escritura: {e}")
     
     return resultado
 
-def generar_notas():
-    """Genera archivo CSV con 4 notas aleatorias por alumno"""
+def cargar_notas():
+    """Genera archivo CSV con 4 notas ingresadas manualmente por alumno y materia"""
     resultado = False
-    estudiantes = []
-    materias = []
-    error_encontrado = False
     
     try:
         print("\n" + "="*50)
         print("GENERANDO ARCHIVO: notas.csv")
         print("="*50)
         
-        f = open(ARCHIVO_ESTUDIANTES, 'r')
-        encabezado = f.readline()  
-        linea = f.readline()
-        while linea:
-            linea = linea.strip()
-            if linea:
-                partes = linea.split(',')
-                if len(partes) >= 4:
-                    estudiantes.append({
-                        'legajo': partes[0],
-                        'año': int(partes[3])
-                    })
-            linea = f.readline()
-        f.close()
+        f_notas = open(ARCHIVO_NOTAS, 'w')
+        f_notas.write("legajo,codigo,nota1,nota2,nota3,nota4\n")
+        f_notas.close()
         
-    except FileNotFoundError:
-        print(f"Error: No se encontró el archivo '{ARCHIVO_ESTUDIANTES}'.")
-        print("Debe generar primero el archivo de estudiantes.")
-        error_encontrado = True
-    except ValueError:
-        print(f"Error: Formato inválido en el archivo de estudiantes")
-        error_encontrado = True
-    except IOError as e:
-        print(f"❌ Error de entrada/salida: {e}")
-        error_encontrado = True
-    else:
-        try:
-            f = open(ARCHIVO_MATERIAS, 'r')
-            encabezado = f.readline() 
-            linea = f.readline()
-            while linea:
-                linea = linea.strip()
-                if linea:
-                    partes = linea.split(',')
-                    if len(partes) >= 3:
-                        materias.append({
-                            'codigo': partes[0],
-                            'año': int(partes[2])
-                        })
-                linea = f.readline()
-            f.close()
+        continuar = True
+        contador = 0
+        
+        while continuar:
+            print("\n" + "-"*50)
             
-        except FileNotFoundError:
-            print(f"Error: No se encontró el archivo '{ARCHIVO_MATERIAS}'.")
-            print("Debe generar primero el archivo de materias.")
-            error_encontrado = True
-        except ValueError:
-            print(f"❌ Error: Formato inválido en el archivo de materias")
-            error_encontrado = True
-        except IOError as e:
-            print(f"❌ Error de entrada/salida: {e}")
-            error_encontrado = True
+            legajo_valido = None
+            año_alumno = None
+            
+            while legajo_valido is None:
+                legajo = input("Ingrese legajo del estudiante (o '0' para terminar): ").strip()
+                
+                if legajo == "0":
+                    continuar = False
+                    break
+                
+                f = open(ARCHIVO_ESTUDIANTES, 'r')
+                f.readline() 
+                linea = f.readline()
+                encontrado = False
+                
+                while linea and not encontrado:
+                    partes = linea.strip().split(',')
+                    if len(partes) >= 4 and partes[0] == legajo:
+                        legajo_valido = legajo
+                        año_alumno = int(partes[3])
+                        encontrado = True
+                    linea = f.readline()
+                f.close()
+                
+                if legajo_valido is None and legajo != "0":
+                    print(f"Legajo '{legajo}' no encontrado. Intente nuevamente.")
+            
+            if not continuar:
+                break
+            
+            codigo_valido = None
+            nombre_materia = None
+            
+            while codigo_valido is None:
+                codigo = input(f"Ingrese código de materia para legajo {legajo_valido}: ").strip()
+                
+                f = open(ARCHIVO_MATERIAS, 'r')
+                f.readline() 
+                linea = f.readline()
+                encontrado = False
+                
+                while linea and not encontrado:
+                    partes = linea.strip().split(',')
+                    if len(partes) >= 3 and partes[0] == codigo:
+                        año_materia = int(partes[2])
+                        
+                        if año_materia == año_alumno:
+                            codigo_valido = codigo
+                            nombre_materia = partes[1]
+                            encontrado = True
+                        else:
+                            print(f"La materia '{partes[1]}' es de año {año_materia}, pero el alumno está en año {año_alumno}.")
+                            break
+                    linea = f.readline()
+                f.close()
+                
+                if codigo_valido is None:
+                    if not encontrado:
+                        print(f"Código '{codigo}' no encontrado. Intente nuevamente.")
+            
+            print(f"\nIngrese las 4 notas para {nombre_materia} (legajo {legajo_valido}):")
+            notas = []
+            
+            for i in range(1, 5):
+                nota_valida = False
+                while not nota_valida:
+                    try:
+                        nota = int(input(f"  Nota {i} (1-10): "))
+                        if 1 <= nota <= 10:
+                            notas.append(nota)
+                            nota_valida = True
+                        else:
+                            print("Error, la nota debe estar entre 1 y 10.")
+                    except ValueError:
+                        print("Error, Debe ingresar un número válido.")
+            
+            f_notas = open(ARCHIVO_NOTAS, 'a')
+            f_notas.write(f"{legajo_valido},{codigo_valido},{notas[0]},{notas[1]},{notas[2]},{notas[3]}\n")
+            f_notas.close()
+            
+            contador += 1
+            print(f"Notas guardadas correctamente. Total de registros: {contador}")
+        
+        if contador > 0:
+            print(f"Archivo '{ARCHIVO_NOTAS}' generado con {contador} registros.")
+            resultado = True
         else:
-            if not estudiantes:
-                print("No hay estudiantes para generar notas.")
-            elif not materias:
-                print("No hay materias para generar notas.")
-            else:
-                try:
-                    f = open(ARCHIVO_NOTAS, 'w')
-                    f.write("legajo,codigo,nota1,nota2,nota3,nota4\n")
-                    
-                    contador = 0
-                    for estudiante in estudiantes:
-                        for materia in materias:
-                            if materia['año'] == estudiante['año']:
-                                nota1 = random.randint(1, 10)
-                                nota2 = random.randint(1, 10)
-                                nota3 = random.randint(1, 10)
-                                nota4 = random.randint(1, 10)
-                                
-                                f.write(f"{estudiante['legajo']},{materia['codigo']},{nota1},{nota2},{nota3},{nota4}\n")
-                                contador += 1
-                    
-                    f.close()
-                    
-                    print(f"Archivo '{ARCHIVO_NOTAS}' generado con {contador} registros (4 notas por alumno).")
-                    resultado = True
-                    
-                except IOError as e:
-                    print(f"❌ Error de entrada/salida: {e}")
-
-    return resultado
-
-def generar_archivos():
-    """Genera los 3 archivos de entrada en secuencia"""
-    print("\n" + "="*60)
-    print("GENERACIÓN DE ARCHIVOS DE ENTRADA")
-    print("="*60)
+            print("No se ingresaron notas.")
+        
+    except FileNotFoundError as e:
+        print(f"Error: No se encontró un archivo necesario.")
+        print("Debe generar primero los archivos de estudiantes y materias.")
+    except ValueError as e:
+        print(f"Error de formato: {e}")
+    except IOError as e:
+        print(f"Error de entrada/salida: {e}")
+    except KeyboardInterrupt:
+        print("Operación cancelada por el usuario.")
     
-    if generar_estudiantes():
-        if generar_materias():
-            generar_notas()
-        else:
-            print("\nNo se pudo continuar con la generación de notas.")
-    else:
-        print("\nNo se pudieron generar los archivos.")
+    return resultado
 
 def menu_principal(usuario):
     """Muestra el menú principal del sistema"""
+    
+    opciones = {
+        "1": alta_usuario,
+        "2": baja_usuario,
+        "3": modificar_contrasena,
+        "4": cargar_materias,
+        "5": cargar_notas,
+        "6": lambda: cargar_asistencia(usuario),
+        "7": lambda: generar_promedios_anuales(usuario),
+        "8": lambda: generar_promedio_por_materia(usuario),
+        "9": mostrar_notas_maxmin
+    }
+    
     continuar = True
     
     while continuar:
@@ -448,51 +490,29 @@ def menu_principal(usuario):
             print("1. Alta de usuario")
             print("2. Baja de usuario")
             print("3. Modificación de contraseña")
-            print("4. Generar archivos de entrada")
-            print("5. Generar archivo de estudiantes")
-            print("6. Generar archivo de materias")
-            print("7. Generar archivo de notas")
-            print("8. Cargar asistencia")
-            print("9. Generar promedios anuales")
-            print("10. Generar promedio por materia")
-            print("11. Mostrar nota mas baja y mas alta por materia")
+            print("4. Cargar plan de estudios")
+            print("5. Cargar notas")
+            print("6. Cargar asistencia")
+            print("7. Generar promedios anuales por alumno")
+            print("8. Generar promedios anuales por materia")
+            print("9. Mostrar nota más baja y más alta por materia")
             print("0. Salir")
             print("="*60)
             
             opcion = input("Seleccione una opción: ").strip()
             
-            if opcion == "1":
-                alta_usuario()
-            elif opcion == "2":
-                baja_usuario()
-            elif opcion == "3":
-                modificar_contrasena()
-            elif opcion == "4":
-                generar_archivos()
-            elif opcion == "5":
-                generar_estudiantes()
-            elif opcion == "6":
-                generar_materias()
-            elif opcion == "7":
-                generar_notas()
-            elif opcion == "8":
-                cargar_asistencia(usuario)
-            elif opcion == "9":
-                generar_promedios_anuales(usuario)
-            elif opcion == "10":
-                generar_promedio_por_materia(usuario)
-            elif opcion == "11":
-                mostrar_notas_maxmin()
-            elif opcion == "0":
+            if opcion == "0":
                 print("\nCerrando sesión...")
                 continuar = False
+            elif opcion in opciones:
+                opciones[opcion]()
             else:
                 print("Opción inválida. Intente nuevamente.")
                 
         except ValueError as e:
-            print(f"❌ Error de valor: {e}")
+            print(f"Error de valor: {e}")
         except KeyboardInterrupt:
-            print("\n\nInterrupción detectada. Cerrando sesión...")
+            print("Interrupción detectada. Cerrando sesión...")
             continuar = False
             
 ARCHIVO_ASISTENCIA = "asistenciaPorMateria.csv"
@@ -502,7 +522,7 @@ ARCHIVO_LOG = "log.txt"
 
 
 def registrar_log(usuario, accion):
-    """Agrega una línea al log sin usar librerías externas"""
+    """Agrega una línea al log"""
     try:
         linea = f"Usuario: {usuario} - Acción: {accion}\n"
         f = open(ARCHIVO_LOG, "a")
@@ -606,24 +626,29 @@ def generar_promedios_anuales(usuario):
 
 def generar_promedio_por_materia(usuario):
     """Calcula el promedio general de una materia"""
+    resultado = None
+    
     try:
-        codigo = input("Código de materia: ").strip()
-
         nombre_materia = None
-        f = open(ARCHIVO_MATERIAS, "r")
-        f.readline()
-        linea = f.readline()
-        while linea:
-            cod, nombre, anio = linea.strip().split(",")
-            if cod == codigo:
-                nombre_materia = nombre
-                break
+        codigo = ""
+        
+        while nombre_materia is None:
+            codigo = input("Código de materia: ").strip()
+            
+            f = open(ARCHIVO_MATERIAS, "r")
+            f.readline()
             linea = f.readline()
-        f.close()
+            while linea:
+                cod, nombre, año = linea.strip().split(",")
+                if cod == codigo:
+                    nombre_materia = nombre
+                    break
+                linea = f.readline()
+            f.close()
+            
+            if nombre_materia is None:
+                print("Código no encontrado. Intente nuevamente.")
 
-        if not nombre_materia:
-            print("Código no encontrado.")
-            return
 
         notas_materia = []
         f = open(ARCHIVO_NOTAS, "r")
@@ -638,23 +663,34 @@ def generar_promedio_por_materia(usuario):
             linea = f.readline()
         f.close()
 
-        if not notas_materia:
+        if notas_materia:
+            prom_general = round(sum(notas_materia) / len(notas_materia), 2)
+
+            f = open(ARCHIVO_PROMEDIOS_MATERIA, "a")
+            f.write(f"{codigo},{nombre_materia},{prom_general}\n")
+            f.close()
+
+            print(f"Promedio general de {nombre_materia}: {prom_general}")
+            registrar_log(usuario, f"Promedio de materia {nombre_materia}")
+            resultado = True
+        else:
             print("No hay notas para esa materia.")
-            return
-
-        prom_general = round(sum(notas_materia) / len(notas_materia), 2)
-
-        f = open(ARCHIVO_PROMEDIOS_MATERIA, "a")
-        f.write(f"{codigo},{nombre_materia},{prom_general}\n")
-        f.close()
-
-        print(f"Promedio general de {nombre_materia}: {prom_general}")
-        registrar_log(usuario, f"Promedio de materia {nombre_materia}")
+            resultado = False
 
     except FileNotFoundError:
         print("Debe generar primero los archivos base.")
-    except Exception as e:
-        print("Error:", e)
+        resultado = False
+    except ValueError as e:
+        print(f"Error de formato: {e}")
+        resultado = False
+    except IOError as e:
+        print(f"Error de entrada/salida: {e}")
+        resultado = False
+    except KeyboardInterrupt:
+        print("Operación cancelada por el usuario.")
+        resultado = False
+    
+    return resultado
         
 def mostrar_notas_maxmin():
     try:
