@@ -2,7 +2,7 @@ import random
 from faker import Faker
 
 
-ARCHIVO_USUARIOS = "usuarios.txt"
+ARCHIVO_USUARIOS = "usuarios.csv"
 ARCHIVO_ESTUDIANTES = "estudiantes.csv"
 ARCHIVO_MATERIAS = "materias.csv"
 ARCHIVO_NOTAS = "notas.csv"
@@ -115,7 +115,7 @@ def alta_usuario():
                 resultado = True
         
     except IOError as e:
-        print(f"❌ Error al acceder al archivo: {e}")
+        print(f"Error al acceder al archivo: {e}")
     
     return resultado
 
@@ -658,19 +658,11 @@ def cargar_asistencia(usuario):
 def generar_promedios_anuales(usuario):
     """Calcula y guarda el promedio anual de cada alumno"""
     try:
-        estudiantes = {}
-        f = open(ARCHIVO_ESTUDIANTES, "r")
-        f.readline()
-        linea = f.readline()
-        while linea:
-            legajo, nombre, apellido, año, division = linea.strip().split(",")
-            estudiantes[legajo] = {"nombre": nombre, "apellido": apellido,
-                                   "año": año, "division": division, "notas": []}
-            linea = f.readline()
-        f.close()
-
+        
+        promedios_por_legajo = {}
+        
         f = open(ARCHIVO_NOTAS, "r")
-        f.readline()
+        f.readline()  
         linea = f.readline()
         while linea:
             partes = linea.strip().split(",")
@@ -678,18 +670,33 @@ def generar_promedios_anuales(usuario):
                 legajo = partes[0]
                 notas = [int(x) for x in partes[2:]]
                 promedio = sum(notas) / len(notas)
-                if legajo in estudiantes:
-                    estudiantes[legajo]["notas"].append(promedio)
+                
+                if legajo not in promedios_por_legajo:
+                    promedios_por_legajo[legajo] = []
+                promedios_por_legajo[legajo].append(promedio)
             linea = f.readline()
         f.close()
-
-        f = open(ARCHIVO_PROMEDIOS_ANUALES, "w")
-        f.write("legajo,nombre,apellido,año,division,promedio\n")
-        for legajo, datos in estudiantes.items():
-            if datos["notas"]:
-                prom_final = round(sum(datos["notas"]) / len(datos["notas"]), 2)
-                f.write(f"{legajo},{datos['nombre']},{datos['apellido']},{datos['año']},{datos['division']},{prom_final}\n")
-        f.close()
+        
+    
+        fout = open(ARCHIVO_PROMEDIOS_ANUALES, "w")
+        fout.write("legajo,nombre,apellido,año,division,promedio\n")
+        
+        fin = open(ARCHIVO_ESTUDIANTES, "r")
+        fin.readline()  
+        linea = fin.readline()
+        while linea:
+            legajo, nombre, apellido, año, division = linea.strip().split(",")
+            
+            if legajo in promedios_por_legajo:
+                notas = promedios_por_legajo[legajo]
+                prom_final = round(sum(notas) / len(notas), 2)
+                fout.write(f"{legajo},{nombre},{apellido},{año},{division},{prom_final}\n")
+                
+                del promedios_por_legajo[legajo]
+            
+            linea = fin.readline()
+        fin.close()
+        fout.close()
 
         print("Archivo 'promediosAnuales.csv' generado correctamente.")
         registrar_log(usuario, "Generó promedios anuales")
