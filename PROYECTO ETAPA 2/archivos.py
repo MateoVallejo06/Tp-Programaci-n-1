@@ -47,7 +47,7 @@ def generar_estudiantes():
     
     return resultado
 
-def cargar_materias():
+def cargar_materias(usuario):
     """Genera archivo CSV con datos de materias ingresadas"""
     resultado = False
     try:
@@ -59,6 +59,7 @@ def cargar_materias():
         estudiantes_generados = generar_estudiantes()
           
         if estudiantes_generados:
+            registrar_log(usuario, "Generó archivo estudiantes.csv")
             print("Ingrese las materias para cada año (ingresar 1 por línea o deje vacío para terminar el año)")
 
         materias_por_año = {}
@@ -98,6 +99,7 @@ def cargar_materias():
         f.close()
         
         print(f"Archivo '{ARCHIVO_MATERIAS}' generado con {total_materias} materias.")
+        registrar_log(usuario, f"Generó archivo materias.csv con {total_materias} materias.")
         resultado = True
         
     except IOError as e:
@@ -105,7 +107,7 @@ def cargar_materias():
     
     return resultado
 
-def cargar_notas():
+def cargar_notas(usuario):
     """Genera archivo CSV con 4 notas ingresadas manualmente por alumno y materia"""
     resultado = False
     
@@ -209,6 +211,7 @@ def cargar_notas():
         
         if contador > 0:
             print(f"Archivo '{ARCHIVO_NOTAS}' generado con {contador} registros.")
+            registrar_log(usuario,f"Cargó {contador} registros de notas en notas.csv")
             resultado = True
         else:
             print("No se ingresaron notas.")
@@ -335,10 +338,11 @@ def cargar_asistencia(usuario):
                 
                 contador += 1
                 print(f"Asistencia registrada correctamente. Total de registros: {contador}")
-                registrar_log(usuario, f"Asistencia materia {codigo_valido}, legajo {legajo_valido}")
+    
             
             if contador > 0:
                 print(f"Se registraron {contador} asistencias en total.")
+                registrar_log(usuario, f"Asistencia materia {codigo_valido}, legajo {legajo_valido}")
             else:
                 print("No se registraron asistencias.")
 

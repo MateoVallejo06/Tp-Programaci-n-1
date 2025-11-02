@@ -1,5 +1,8 @@
-import Funciones
-
+import archivos
+import log
+import reportes
+import usuarios
+import menu
 
 def main():
     """Función principal del programa"""
@@ -8,14 +11,14 @@ def main():
         print("SISTEMA DE GESTIÓN EDUCATIVA")
         print("="*60)
         
-        Funciones.crear_archivo_usuarios()
+        usuarios.crear_archivo_usuarios()
         
-        usuario_actual = Funciones.login()
+        usuario_actual = usuarios.login()
         
         if usuario_actual:
             print(f"Bienvenido/a, {usuario_actual}!")
 
-            Funciones.menu_principal(usuario_actual)
+            menu.menu_principal(usuario_actual)
         else:
             print("Acceso denegado. Cerrando el sistema...")
     

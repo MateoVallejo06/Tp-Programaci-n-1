@@ -1,4 +1,5 @@
 ARCHIVO_USUARIOS = "usuarios.csv"
+from log import registrar_log
 
 def crear_archivo_usuarios():
     """Crea el archivo de usuarios si no existe con usuarios por defecto"""
@@ -11,6 +12,7 @@ def crear_archivo_usuarios():
         f.write("secretario,admin456\n")
         f.close()
         print("Archivo de usuarios creado")
+
 
 def login():
     """Maneja el proceso de login del usuario"""
@@ -81,7 +83,7 @@ def listar_usuarios():
     return usuarios
 
 
-def alta_usuario():
+def alta_usuario(usuario):
     """Registra un nuevo usuario en el sistema"""
     resultado = False
     try:
@@ -105,6 +107,7 @@ def alta_usuario():
                 f.write(f"{nuevo_usuario},{nueva_contrasena}\n")
                 f.close()
                 print(f"Usuario '{nuevo_usuario}' registrado.")
+                registrar_log(usuario,f"Alta de usuarios: {nuevo_usuario}")
                 resultado = True
         
     except IOError as e:
@@ -112,7 +115,7 @@ def alta_usuario():
     
     return resultado
 
-def baja_usuario():
+def baja_usuario(usuario_actual):
     """Elimina un usuario del sistema"""
     resultado = False
     try:
@@ -159,6 +162,7 @@ def baja_usuario():
                 f_escritura.close()
                 
                 print(f"Usuario '{usuario_eliminar}' eliminado exitosamente.")
+                registrar_log(usuario_actual,f"Baja de usuario: {usuario_eliminar}")
                 resultado = True
         
     except FileNotFoundError:
@@ -168,7 +172,7 @@ def baja_usuario():
     
     return resultado
 
-def modificar_contrasena():
+def modificar_contrasena(usuario_actual):
     """Modifica la contraseña de un usuario existente"""
     resultado = False
     try:
@@ -226,6 +230,7 @@ def modificar_contrasena():
                         f_escritura.close()
                         
                         print(f"Contraseña de '{usuario_modificar}' modificada exitosamente.")
+                        registrar_log(usuario_actual,f"Cambio de contraseña: {usuario_modificar}")
                         resultado = True
         
     except FileNotFoundError:

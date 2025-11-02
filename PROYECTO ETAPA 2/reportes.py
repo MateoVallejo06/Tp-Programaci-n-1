@@ -54,7 +54,7 @@ def generar_promedios_anuales(usuario):
             linea = fin.readline()
         fin.close()
         with open(ARCHIVO_NOTAS, "r") as f:
-            next(f)  # salteamos encabezado
+            next(f)  
             total = contar_lineas_recursivo(f)  
             print(f"Total de registros procesados: {total}")
         fout.close()
@@ -140,29 +140,69 @@ def generar_promedio_por_materia(usuario):
     
     return resultado
         
-def mostrar_notas_maxmin():
+def mostrar_notas_maxmin(usuario):
     try:
-        codigo = input("Código de materia: ").strip()
+
+        codigo_valido = None
+        nombre_materia = None
+        
+        while codigo_valido is None:
+            codigo = input("Código de materia: ").strip()
+            
+            
+            f = open(ARCHIVO_MATERIAS, "r")
+            f.readline()  
+            linea = f.readline()
+            encontrado = False
+            
+            while linea and not encontrado:
+                partes = linea.strip().split(",")
+                if len(partes) >= 3 and partes[0] == codigo:
+                    codigo_valido = codigo
+                    nombre_materia = partes[1]
+                    encontrado = True
+                linea = f.readline()
+            f.close()
+            
+            if codigo_valido is None:
+                print(f"Código de materia '{codigo}' no encontrado. Intente nuevamente.")
+        
+    
         f = open(ARCHIVO_NOTAS, "r")
         f.readline()
         notas_totales = []
         linea = f.readline()
         while linea:
             partes = linea.strip().split(",")
-            if partes[1] == codigo:
+            if len(partes) >= 6 and partes[1] == codigo_valido:
                 notas = [int(x) for x in partes[2:]]
                 notas_totales.extend(notas)
             linea = f.readline()
         f.close()
 
         if notas_totales:
-            print("Nota más baja:", min(notas_totales))
-            print("Nota más alta:", max(notas_totales))
+
+            nota_minima = min(notas_totales)
+            nota_maxima = max(notas_totales)
+
+
+            print(f"\nEstadísticas de {nombre_materia}:")
+            print(f"   Nota más baja: {nota_minima}")
+            print(f"   Nota más alta: {nota_maxima}")
+
+            registrar_log(usuario, f"Consultó estadísticas de {nombre_materia} (min: {nota_minima}, max: {nota_maxima})")
         else:
-            print("No hay notas para esa materia.")
+            print(f"No hay notas registradas para {nombre_materia}.")
+            
     except FileNotFoundError:
-        print("Debe generar primero los archivos de entrada: ")
-        print("Plan de estudios (opción 4) - Cargar notas (opción 5)")
+        print("Error: Archivos no encontrados.")
+        print("   Debe generar primero:")
+        print("   - Plan de estudios (opción 4)")
+        print("   - Cargar notas (opción 5)")
+    except ValueError as e:
+        print(f"Error de formato en las notas: {e}")
+    except IOError as e:
+        print(f"Error de entrada/salida: {e}")
         
         
 ARCHIVO_PROMEDIOS_ANUALES = "promediosAnuales.csv"
